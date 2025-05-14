@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Rating from '@/components/ui/Rating';
 import SearchInput from '@/components/ui/SearchInput';
+import Image from 'next/image';
 
 interface MovieType {
     id: number;
@@ -79,9 +80,11 @@ export default function SearchResults() {
                             <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all cursor-pointer">
                                 <figure>
                                     {(item.backdrop_path || item.poster_path) ? (
-                                        <img
+                                        <Image
                                             src={`https://image.tmdb.org/t/p/w500${item.backdrop_path || item.poster_path}`}
                                             alt={item.title || item.name}
+                                            width={500}
+                                            height={192}
                                             className="w-full h-48 object-cover"
                                         />
                                     ) : (
