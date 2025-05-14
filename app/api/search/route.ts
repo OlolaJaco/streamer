@@ -17,7 +17,7 @@ export async function GET(request: Request) {
       `/3/search/movie?query=${encodeURIComponent(query)}&language=en-US&page=1`
     );
     return NextResponse.json(data);
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to search movies" },
       { status: 500 }

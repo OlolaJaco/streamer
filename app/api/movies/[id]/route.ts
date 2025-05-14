@@ -17,7 +17,7 @@ export async function GET(
       const tvData = await fetchFromApi(`/3/tv/${params.id}?language=en-US`);
       return NextResponse.json(tvData);
     }
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch movie details" },
       { status: 500 }
