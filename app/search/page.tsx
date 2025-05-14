@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = 'force-dynamic';
-
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Rating from '@/components/ui/Rating';
@@ -73,37 +71,39 @@ export default function SearchResults() {
             <SearchInput />
             <h1 className="text-3xl font-bold mb-6">Search Results for: {query}</h1>
 
-            {results.length === 0 ? (
-                <p className="text-xl">No results found for your search.</p>
-            ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {results.map((item) => (
-                        <Link key={item.id} href={`/${item.id}`}>
-                            <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all cursor-pointer">
-                                <figure>
-                                    {(item.backdrop_path || item.poster_path) ? (
-                                        <Image
-                                            src={`https://image.tmdb.org/t/p/w500${item.backdrop_path || item.poster_path}`}
-                                            alt={item.title || item.name}
-                                            width={500}
-                                            height={192}
-                                            className="w-full h-48 object-cover"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
-                                            No Image
-                                        </div>
-                                    )}
-                                </figure>
-                                <div className="card-body">
-                                    <h2 className="card-title">{item.title || item.name}</h2>
-                                    <Rating rating={item.vote_average} />
+            <Suspense>
+                {results.length === 0 ? (
+                    <p className="text-xl">No results found for your search.</p>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {results.map((item) => (
+                            <Link key={item.id} href={`/${item.id}`}>
+                                <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all cursor-pointer">
+                                    <figure>
+                                        {(item.backdrop_path || item.poster_path) ? (
+                                            <Image
+                                                src={`https://image.tmdb.org/t/p/w500${item.backdrop_path || item.poster_path}`}
+                                                alt={item.title || item.name}
+                                                width={500}
+                                                height={192}
+                                                className="w-full h-48 object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-48 bg-gray-300 flex items-center justify-center">
+                                                No Image
+                                            </div>
+                                        )}
+                                    </figure>
+                                    <div className="card-body">
+                                        <h2 className="card-title">{item.title || item.name}</h2>
+                                        <Rating rating={item.vote_average} />
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-            )}
+                            </Link>
+                        ))}
+                    </div>
+                )}
+            </Suspense>
         </div>
     );
 }
