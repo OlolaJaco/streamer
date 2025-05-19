@@ -5,6 +5,15 @@ import { useParams } from 'next/navigation';
 import Rating from '@/components/ui/Rating';
 import Image from 'next/image';
 
+// interface VideoType {
+//     id: string;
+//     key: string;
+//     name: string;
+//     site: string;
+//     type: string;
+//     official: boolean;
+// }
+
 interface MovieDetailType {
     id: number;
     title: string;
@@ -16,6 +25,16 @@ interface MovieDetailType {
     release_date?: string;
     first_air_date?: string;
     genres: { id: number; name: string }[];
+    videos?: {
+        results: Array<{
+            key: string;
+            name: string;
+            site: string;
+            type: string;
+            id: string;
+            official?: boolean;
+        }>
+    };
 }
 
 export default function MovieDetail() {
@@ -23,6 +42,29 @@ export default function MovieDetail() {
     const [movie, setMovie] = useState<MovieDetailType | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [showTrailer, setShowTrailer] = useState(false);
+    const [trailerKey, setTrailerKey] = useState<string | null>(null);
+
+    // Function to find the best trailer
+    const findBestTrailer = (videos: MovieDetailType['videos']) => {
+        if (!videos || !videos.results || videos.results.length === 0) return null;
+        
+        // First try to find an official trailer
+        const officialTrailer = videos.results.find(
+            video => video.type === "Trailer" && video.site === "YouTube" && video.official === true
+        );
+        if (officialTrailer) return officialTrailer.key;
+        
+        // If no official trailer, find any trailer
+        const anyTrailer = videos.results.find(
+            video => video.type === "Trailer" && video.site === "YouTube"
+        );
+        if (anyTrailer) return anyTrailer.key;
+        
+        // If no trailer, just get the first YouTube video
+        const anyVideo = videos.results.find(video => video.site === "YouTube");
+        return anyVideo ? anyVideo.key : null;
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -30,6 +72,9 @@ export default function MovieDetail() {
             .then(res => res.json())
             .then(data => {
                 setMovie(data);
+                // Find and set trailer key if available
+                const key = findBestTrailer(data.videos);
+                setTrailerKey(key);
                 setLoading(false);
             })
             .catch(err => {
@@ -62,6 +107,29 @@ export default function MovieDetail() {
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
+            {/* YouTube Trailer Modal using iframe */}
+            {showTrailer && trailerKey && (
+                <div className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+                    <div className="relative w-full max-w-4xl">
+                        <button 
+                            onClick={() => setShowTrailer(false)}
+                            className="absolute top-0 right-0 bg-red-600 text-white p-2 rounded-full -mt-4 -mr-4 z-10"
+                        >
+                            X
+                        </button>
+                        <div className="aspect-video bg-black">
+                            <iframe
+                                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1`}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                title="Movie Trailer"
+                            ></iframe>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
             <div className="hero min-h-screen bg-base-200 rounded-xl shadow-xl">
                 <div className="hero-content flex-col lg:flex-row">
                     <div className="lg:w-1/3">
@@ -84,6 +152,16 @@ export default function MovieDetail() {
                         <div className="flex items-center gap-4">
                             {typeof movie.vote_average === 'number' && <Rating rating={voteAverage} />}
                             <span>{voteAverage.toFixed(1)}</span>
+                            
+                            {/* Trailer Button */}
+                            {trailerKey && (
+                                <button 
+                                    onClick={() => setShowTrailer(true)}
+                                    className="btn btn-primary btn-sm ml-4"
+                                >
+                                    Watch Trailer
+                                </button>
+                            )}
                         </div>
                         <div className="flex flex-wrap gap-2">
                             {genres.map(genre => (
