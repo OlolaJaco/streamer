@@ -55,6 +55,11 @@ export default function MovieDetail() {
         );
     }
 
+    // Defensive: If vote_average is missing, show 0 and skip Rating
+    const voteAverage = typeof movie.vote_average === 'number' ? movie.vote_average : 0;
+    // Defensive: If genres is missing or not an array, use empty array
+    const genres = Array.isArray(movie.genres) ? movie.genres : [];
+
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto">
             <div className="hero min-h-screen bg-base-200 rounded-xl shadow-xl">
@@ -77,11 +82,11 @@ export default function MovieDetail() {
                     <div className="lg:w-2/3 space-y-6 p-6">
                         <h1 className="text-4xl font-bold">{movie.title || movie.name}</h1>
                         <div className="flex items-center gap-4">
-                            <Rating rating={movie.vote_average} />
-                            <span>{movie.vote_average.toFixed(1)}</span>
+                            {typeof movie.vote_average === 'number' && <Rating rating={voteAverage} />}
+                            <span>{voteAverage.toFixed(1)}</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
-                            {movie.genres.map(genre => (
+                            {genres.map(genre => (
                                 <span key={genre.id} className="badge badge-outline p-3">{genre.name}</span>
                             ))}
                         </div>
