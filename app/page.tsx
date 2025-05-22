@@ -1,3 +1,4 @@
+import Herosection from "@/components/Herosection";
 import MoviesCarousel from "@/components/MoviesCarousel";
 import TrendingCarousel from "@/components/TrendingCarousel";
 import TvSeriesCarousel from "@/components/TvSeriesCarousel";
@@ -8,6 +9,7 @@ export default function Home() {
   return (
     <div className="bg-base-100 text-base-content">
       <section className="max-w-7xl mx-auto">
+        <Herosection />
         <SearchInput />
         <TrendingCarousel />
         <MoviesCarousel />

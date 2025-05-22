@@ -7,7 +7,7 @@ import { fetchFromApi } from "@/utils/apiClient";
 export async function GET() {
   try {
     // Test with movie ID 11 (Star Wars) and append videos
-    const movieData = await fetchFromApi(`/3/movie/11?append_to_response=videos`);
+    const movieData = await fetchFromApi(`/3/movie/1399?append_to_response=season/1,season/2`);
     
     // Log the response to see the structure
     console.log('API Response with videos:', JSON.stringify(movieData, null, 2));

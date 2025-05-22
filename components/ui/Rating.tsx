@@ -13,9 +13,9 @@ const Rating: React.FC<RatingProps> = ({ rating }) => {
   return (
     <div className="flex text-2xl">
       {[...Array(fullStars)].map((_, index) => (
-        <FaStar key={index} aria-label={`${index + 1} star`} className="text-yellow-500" />
+        <FaStar key={index} aria-label={`${index + 1} star`} className="text-primary" />
       ))}
-      {halfStar && <FaStarHalfAlt aria-label="half star" className="text-yellow-500" />}
+      {halfStar && <FaStarHalfAlt aria-label="half star" className="text-primary" />}
       {[...Array(5 - fullStars - (halfStar ? 1 : 0))].map((_, index) => (
         <FaRegStar key={index + fullStars + 1} aria-label="empty star" className="text-gray-400" />
       ))}

@@ -2,17 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation'; // Import notFound
 import Rating from '@/components/ui/Rating';
 import Image from 'next/image';
-
-// interface VideoType {
-//     id: string;
-//     key: string;
-//     name: string;
-//     site: string;
-//     type: string;
-//     official: boolean;
-// }
 
 interface MovieDetailType {
     id: number;
@@ -69,8 +61,19 @@ export default function MovieDetail() {
     useEffect(() => {
         setLoading(true);
         fetch(`/api/movies/${id}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Movie not found");
+                }
+                return res.json();
+            })
             .then(data => {
+                if (!data || Object.keys(data).length === 0) {
+                    // Trigger the not-found page directly
+                    notFound();
+                    return;
+                }
+                
                 setMovie(data);
                 // Find and set trailer key if available
                 const key = findBestTrailer(data.videos);
@@ -81,6 +84,8 @@ export default function MovieDetail() {
                 console.error("Error fetching movie details:", err);
                 setError("Failed to load movie details");
                 setLoading(false);
+                // Trigger not-found after a brief delay to show the error
+                setTimeout(() => notFound(), 1000);
             });
     }, [id]);
 
@@ -93,9 +98,12 @@ export default function MovieDetail() {
     }
 
     if (error || !movie) {
+        // Show error briefly before redirecting
         return (
             <div className="p-10 md:p-20 text-center">
                 <h1 className="text-xl font-bold text-error">{error || "Movie not found"}</h1>
+                <p className="mt-4">Redirecting to not found page...</p>
+                { notFound() }
             </div>
         );
     }
@@ -113,7 +121,7 @@ export default function MovieDetail() {
                     <div className="relative w-full max-w-4xl">
                         <button 
                             onClick={() => setShowTrailer(false)}
-                            className="absolute top-0 right-0 bg-red-600 text-white p-2 rounded-full -mt-4 -mr-4 z-10"
+                            className="absolute top-0 right-0 bg-neutral text-white p-2 rounded-full -mt-4 -mr-4 z-10 cursor-pointer"
                         >
                             X
                         </button>
@@ -130,9 +138,14 @@ export default function MovieDetail() {
                 </div>
             )}
             
-            <div className="hero min-h-screen bg-base-200 rounded-xl shadow-xl">
+            <div className="hero min-h-screen bg-base-200 rounded-xl shadow-xl text-white"
+                style={movie?.backdrop_path ? {
+                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+             } : {}}>
                 <div className="hero-content flex-col lg:flex-row">
-                    <div className="lg:w-1/3">
+                    <div className="lg:w-1/3 m-8">
                         {(movie.poster_path) ? (
                             <Image
                                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
