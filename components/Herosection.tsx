@@ -40,13 +40,13 @@ const Herosection = () => {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
              } : {}}>
-            <div className="text-white w-full px-4 md:px-8 pb-8">
-                <div className="backdrop-blur-sm bg-black/50 p-6 rounded-lg max-w-sm">
-                    <h1 className="text-5xl font-bold mb-4">
-                        {randomMovie ? randomMovie.title : <LoadingBars /> }
+            <div className="text-white w-full px-2 md:px-8 pb-4 md:pb-8">
+                <div className="backdrop-blur-sm bg-black/50 p-3 md:p-6 max-w-sm">
+                    <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4">
+                        {randomMovie ? randomMovie.title : <LoadingBars />}
                     </h1>
                     <RadialProgress popularity={777} />
-                    <Link href={`/${randomMovie?.id}`} className="btn btn-neutral m-4">Watch Now</Link>
+                    <Link href={`/${randomMovie?.id}`} className="btn btn-neutral btn-sm md:btn-md ml-2 mt-2 md:m-4">Watch Now</Link>
                 </div>
             </div>
         </div>
