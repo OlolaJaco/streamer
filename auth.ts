@@ -1,12 +1,15 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { connectToDatabase } from "./lib/mongoose";
-import User from '@/models/User';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Google],
   
   debug: process.env.NODE_ENV === 'development',
+  
+  // Use JWT strategy for Edge Runtime compatibility
+  session: {
+    strategy: "jwt"
+  },
   
   // Configure one or more authentication providers incase i need them
   // pages: {
@@ -20,41 +23,46 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user }) {
       try {
-        await connectToDatabase();
-
-        const existingUser = await User.findOne({ email: user.email });
-
-        if (!existingUser) {
-          await User.create({
+        // Move database operations to a separate API route
+        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/sync-user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             name: user.name,
             email: user.email,
             image: user.image,
-          });
-          console.log('New user created:', user.email);
-        } else {
-          console.log('Existing user signed in:', user.email);
+          }),
+        });
+
+        if (!response.ok) {
+          console.error('Failed to sync user to database');
         }
+        
         return true;
       } catch (error) {
         console.error('SignIn callback error:', error);
-        return false;
+        return true; // Continue with sign in even if DB sync fails
       }
     },
 
-    async session({ session }) {
-      try {
-        await connectToDatabase();
-
-        const dbUser = await User.findOne({ email: session.user.email});
-
-        if (dbUser) {
-          (session.user as any)._id = dbUser._id.toString();
-        }
-        return session;
-      } catch (error) {
-        console.error('Session callback error:', error);
-        return session;
+    async jwt({ token, user }) {
+      if (user) {
+        token.name = user.name;
+        token.email = user.email;
+        token.picture = user.image;
       }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.name = token.name as string || '';
+        session.user.email = token.email as string || '';
+        session.user.image = token.picture as string || '';
+      }
+      return session;
     },
   },
   
