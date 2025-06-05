@@ -11,7 +11,7 @@ const NavBar = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
-    <div className="navbar bg-base-100 shadow-2xl text-base-content">
+    <nav className="navbar bg-base-100 shadow-2xl text-base-content">
       <div className="max-w-7xl mx-auto flex justify-between items-center w-full border p-4">
         <div className="flex-1">
           <Link href="/" className="btn btn-ghost text-xl">
@@ -52,7 +52,7 @@ const NavBar = () => {
           )}
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 
