@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import NavBar from "@/components/ui/NavBar";
 import ThemeProvider from "@/components/ui/ThemeProvider";
+import { Providers } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,10 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} overflow-x-hidden`}>
         <ThemeProvider>
-          <NavBar />
-          <main className="bg-base-100 text-base-content">
-            {children}
-          </main>
+          <Providers>
+            <NavBar />
+            <main className="bg-base-100 text-base-content">{children}</main>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>
