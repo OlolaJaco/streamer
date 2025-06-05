@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user }) {
       try {
         // Move database operations to a separate API route
-        const response = await fetch(`${process.env.NEXTAUTH_URL}/api/auth/sync-user`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_APP_BASE_URL}/api/auth/sync-user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
