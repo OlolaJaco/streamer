@@ -29,12 +29,24 @@ export async function connectToDatabase() {
     }
 
     if (!cached.promise) {
-
+        console.log('Connecting to MongoDB:', MONGODB_URI);
+        
         cached.promise = mongoose.connect(MONGODB_URI, {
             bufferCommands: false,
-        })
+        }).catch((error) => {
+            console.error('MongoDB connection error:', error);
+            cached.promise = null;
+            throw error;
+        });
     }
 
-    cached.conn = await cached.promise;
-    return cached.conn;
+    try {
+        cached.conn = await cached.promise;
+        console.log('MongoDB connected successfully');
+        return cached.conn;
+    } catch (error) {
+        console.error('Failed to connect to MongoDB:', error);
+        cached.promise = null;
+        throw error;
+    }
 }
